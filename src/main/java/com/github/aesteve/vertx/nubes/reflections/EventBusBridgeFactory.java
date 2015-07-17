@@ -5,6 +5,10 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.ext.web.handler.CookieHandler;
+import io.vertx.ext.web.handler.SessionHandler;
+import io.vertx.ext.web.handler.UserSessionHandler;
 import io.vertx.ext.web.handler.sockjs.BridgeEvent;
 import io.vertx.ext.web.handler.sockjs.BridgeOptions;
 import io.vertx.ext.web.handler.sockjs.PermittedOptions;
@@ -16,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.vertx.ext.web.sstore.LocalSessionStore;
 import org.reflections.Reflections;
 
 import com.github.aesteve.vertx.nubes.Config;
@@ -71,6 +76,13 @@ public class EventBusBridgeFactory extends AbstractInjectionFactory implements H
 			} else {
 				path += "/*";
 			}
+		}
+		//Needed handlers to allow the use of authentication through eventbus
+		if(config.authProvider!=null) {
+			router.route(path).handler(CookieHandler.create());
+			router.route(path).handler(BodyHandler.create());
+			router.route(path).handler(SessionHandler.create(LocalSessionStore.create(config.vertx)));
+			router.route(path).handler(UserSessionHandler.create(config.authProvider));
 		}
 		router.route(path).handler(sockJSHandler);
 	}

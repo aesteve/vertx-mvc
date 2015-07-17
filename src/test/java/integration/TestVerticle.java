@@ -100,6 +100,8 @@ public class TestVerticle extends AbstractVerticle {
 		throttling.put("time-unit", TimeUnit.SECONDS.toString());
 		throttling.put("count", 2); // 2 request per 10 seconds
 		config.put("throttling", throttling);
+		JsonArray templates = new JsonArray().add("hbs").add("jade").add("templ").add("thymeleaf");
+		config.put("templates",templates);
 		log.info("Config : " + config.toString());
 		return config;
 	}

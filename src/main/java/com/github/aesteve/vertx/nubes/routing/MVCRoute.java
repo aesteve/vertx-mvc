@@ -37,11 +37,13 @@ public class MVCRoute {
 	private MVCRoute redirectRoute;
 	private Handler<RoutingContext> authHandler;
 	private String loginRedirect;
+	private String logoutRedirect;
 	private Handler<RoutingContext> preInterceptor;
 	private Handler<RoutingContext> postInterceptor;
 	private Config config;
 	private boolean disabled;
 	private BiConsumer<RoutingContext, ?> returnHandler;
+	private String afterRedirectUrl;
 
 	public MVCRoute(Object instance, String path, HttpMethod method, Config config, Handler<RoutingContext> authHandler, boolean disabled) {
 		this.instance = instance;
@@ -66,6 +68,10 @@ public class MVCRoute {
 
 	public void setLoginRedirect(String loginRedirect) {
 		this.loginRedirect = loginRedirect;
+	}
+
+	public void setLogoutRedirect(String logoutRedirect) {
+		this.logoutRedirect = logoutRedirect;
 	}
 
 	public void addProcessor(Processor processor) {
@@ -139,19 +145,33 @@ public class MVCRoute {
 			});
 		}
 		if (authHandler != null) {
+			//Maybe could be replaced by some regex like pathFinal + "*" ?
 			router.route(httpMethodFinal, pathFinal).handler(CookieHandler.create());
-			// router.route(httpMethodFinal, pathFinal).handler(BodyHandler.create());
-			router.route(httpMethodFinal, pathFinal).handler(UserSessionHandler.create(config.authProvider));
 			router.route(httpMethodFinal, pathFinal).handler(SessionHandler.create(LocalSessionStore.create(config.vertx)));
+			router.route(httpMethodFinal, pathFinal).handler(UserSessionHandler.create(config.authProvider));
 			router.route(httpMethodFinal, pathFinal).handler(authHandler);
+
 			if (loginRedirect != null && !"".equals(loginRedirect)) {
+				afterRedirectUrl = pathFinal; //We set the afterRedirectUrl only if there is a loginRedirect
 				router.post(loginRedirect).handler(CookieHandler.create());
 				router.post(loginRedirect).handler(BodyHandler.create());
-				router.post(loginRedirect).handler(UserSessionHandler.create(config.authProvider));
 				router.post(loginRedirect).handler(SessionHandler.create(LocalSessionStore.create(config.vertx)));
+				router.post(loginRedirect).handler(UserSessionHandler.create(config.authProvider));
 				router.post(loginRedirect).handler(FormLoginHandler.create(config.authProvider));
 			}
 		}
+
+		if (logoutRedirect != null){
+			router.get(pathFinal).handler(CookieHandler.create());
+			router.get(pathFinal).handler(BodyHandler.create());
+			router.get(pathFinal).handler(SessionHandler.create(LocalSessionStore.create(config.vertx)));
+			router.get(pathFinal).handler(UserSessionHandler.create(config.authProvider));
+			router.get(pathFinal).handler(context -> {
+				context.clearUser();
+				context.response().putHeader("location", logoutRedirect).setStatusCode(302).end();
+			});
+		}
+
 		processors.forEach(processor -> {
 			router.route(httpMethodFinal, pathFinal).handler(processor::preHandle);
 		});
@@ -161,8 +181,9 @@ public class MVCRoute {
 					router.route(httpMethodFinal, pathFinal).handler(handler);
 				}
 			} else {
-				router.route(httpMethodFinal, pathFinal).handler(handler);
-			}
+				if(!(pathFinal.equals(afterRedirectUrl) && (handler instanceof BodyHandler))) //We don't attach the BodyHandler
+					router.route(httpMethodFinal, pathFinal).handler(handler);				  //when path is same as afterRedirectUrl
+			}																				  //to avoid "body already read" exception
 
 		});
 		int i = 0;

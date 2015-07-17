@@ -1,5 +1,6 @@
 package com.github.aesteve.vertx.nubes.reflections;
 
+import com.github.aesteve.vertx.nubes.annotations.auth.Logout;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.logging.Logger;
@@ -108,10 +109,18 @@ public class RouteFactory extends AbstractInjectionFactory implements HandlerFac
 		for (Method method : controller.getDeclaredMethods()) {
 			if (HttpMethodFactory.isRouteMethod(method)) {
 				Auth trAuth = method.getAnnotation(Auth.class);
+				Logout trLogout = method.getAnnotation(Logout.class);
+
 				if (trAuth == null) {
 					trAuth = controller.getAnnotation(Auth.class);
 				}
+				if (trLogout == null) {
+					trLogout = controller.getAnnotation(Logout.class);
+				}
+
 				final Auth auth = trAuth; // java 8...
+				final Logout logout = trLogout;
+
 				Set<Handler<RoutingContext>> paramsHandlers = new LinkedHashSet<>();
 				Class<?>[] parameterClasses = method.getParameterTypes();
 				Annotation[][] parametersAnnotations = method.getParameterAnnotations();
@@ -141,15 +150,21 @@ public class RouteFactory extends AbstractInjectionFactory implements HandlerFac
 				httpMethods.forEach((httpMethod, path) -> {
 					Handler<RoutingContext> authHandler = null;
 					String redirectURL = null;
+					String logoutURL = null;
 					if (auth != null) {
 						authHandler = authFactory.create(auth);
 						if (AuthMethod.REDIRECT.equals(auth.method())) {
 							redirectURL = auth.redirectURL();
 						}
 					}
+					if (logout != null) {
+						logoutURL = logout.logoutURL();
+					}
+
 					boolean disabled = method.isAnnotationPresent(Disabled.class) || controller.isAnnotationPresent(Disabled.class);
 					MVCRoute route = new MVCRoute(instance, basePath + path, httpMethod, config, authHandler, disabled);
 					route.setLoginRedirect(redirectURL);
+					route.setLogoutRedirect(logoutURL);
 					for (Annotation methodAnnotation : method.getDeclaredAnnotations()) {
 						Class<? extends Annotation> annotClass = methodAnnotation.annotationType();
 						Set<Handler<RoutingContext>> handler = config.annotationHandlers.get(annotClass);

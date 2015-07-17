@@ -62,8 +62,9 @@ This route (or every route in the controller) is protected by authentication.
 
 * Retention : Method or Class
 * Attributes :
-	* method (mandatory) : the method to use as protection (only "BASIC" for basic http authentication) supported yet
+	* method (mandatory) : the method to use as protection. Supported methods are : BASIC, JWT and REDIRECT.
 	* authority : the authority (i.e. "level-access") needed to access this route
+	* redirectUrl : The redirection url needed when using REDIRECT method.
 
 ### `@User`
 

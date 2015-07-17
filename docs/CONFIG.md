@@ -9,7 +9,7 @@ Here is the list of all supported configurations (for now):
 
 * **Type:**   *String*
 
-* **Description:**   This is the base package of your project, it should look like "user.company.projectname". It's a convention-over-configuraton shorthand for other keys below. If you follow our own conventions, you'll only need this key set-up. If not, the keys below will override the default ones.
+* **Description:**   This is the base package of your project, it should look like `user.company.projectname`. It's a convention-over-configuraton shorthand for other keys below. If you follow our own conventions, you'll only need this key set-up. If not, the keys below will override the default ones.
 
 * **Default:** No default value (then you'll need to define controllers, fixtures, domains, verticle, services packages independently)
 
@@ -21,7 +21,7 @@ Here is the list of all supported configurations (for now):
 
 * **Description:**   This is a JsonArray, which should contain all the packages where your controllers are located. 
 
-* **Default:**	 If the key is missing, the value will be a concatenation of the *src-package* value with ".controllers". If it doesn't exist, well, you'll have no controllers set-up. Which can be fine if you're not using them.
+* **Default:**	 If the key is missing, the value will be a concatenation of the `src-package` value with `.controllers`. If it doesn't exist, well, you'll have no controllers set-up. Which can be fine if you're not using them.
 
 
 ### `fixture-packages`
@@ -31,7 +31,7 @@ Here is the list of all supported configurations (for now):
 
 * **Description:**   This is a JsonArray, which should contain all the packages where your fixtures are located. 
 
-* **Default:**  *src-package* value concat with ".fixtures".
+* **Default:**  `src-package` value concat with `.fixtures`.
 
 
 ### `domain-package`
@@ -41,7 +41,7 @@ Here is the list of all supported configurations (for now):
 
 * **Description:**   This will set the package of your domains.
 
-* **Default:**	  *src-package* value concat with ".domains".
+* **Default:**	  `src-package` value concat with `.domains`.
 
 
 ### `verticle-package`
@@ -51,7 +51,7 @@ Here is the list of all supported configurations (for now):
 
 * **Description:**   This will set the package of your verticles.
 
-* **Default:**	  *src-package* value concat with ".verticles".
+* **Default:**	  `src-package` value concat with `.verticles`.
 
 
 ### `services`
@@ -69,7 +69,7 @@ Here is the list of all supported configurations (for now):
 
 * **Type:**   *JsonArray*
 
-* **Description:**   A JsonArray (of String) which contains all templates supported by the application. The expected values are: "hbs" for Handlebars, "jade" for Jade, "templ" for MVEL and "thymeleaf" for Thymeleaf (for the last one, you need to use .html file extension).
+* **Description:**   A JsonArray (of String) which contains all templates supported by the application. The expected values are: `hbs` for Handlebars, `jade` for Jade, `templ` for MVEL and `thymeleaf` for Thymeleaf (for the last one, you need to use .html file extension).
 
 * **Default:**   No default value.
 
@@ -91,7 +91,7 @@ TODO :
 
 * **Description:**   This will set the webroot for your application.
 
-* **Default:**	  default value is "web/assets".
+* **Default:**	  default value is `web/assets`.
 
 
 ### `static-path`
@@ -101,7 +101,7 @@ TODO :
 
 * **Description:**   This will set the path for your static files in your application.
 
-* **Default:**	  default value is "/assets".
+* **Default:**	  default value is `/assets`.
 * 
 ### `views-dir`
 
@@ -110,12 +110,12 @@ TODO :
 
 * **Description:**   This will set the path for your template files in your application.
 
-* **Default:**	  default value is "web/views".
+* **Default:**	  default value is `web/views`.
 
 
 ### `Configuration example`
 
-Here is an example of a valid conf.json file :
+Here is an example of a valid `conf.json` file :
 
 ```json
 {
@@ -137,8 +137,8 @@ As you can see, some values are overriden and aren't using Nubes conventions:
 * controllers
 
 
-It's not the case of the *verticle-package* key, which is missing from the configuration. 
-Thus the value in the configuration will then be "mycompany.myproject.verticles". If the package exists and contains verticles (annotated with `@Verticle`, Nubes will deploy them. If it's empty or does'nt exist, well... Nubes won't...
+It's not the case of the `verticle-package` key, which is missing from the configuration. 
+Thus the value in the configuration will then be `mycompany.myproject.verticles`. If the package exists and contains verticles (annotated with `@Verticle`, Nubes will deploy them. If it's empty or does'nt exist, well... Nubes won't...
 
 
 ## NubesServer configuration
@@ -153,7 +153,7 @@ In this case, you'll use `NubesServer` our own implementation of a web-server Ve
 
 * **Description:**   This is the hostname of your server.
 
-* **Default:**   Default value (only for NubesServer instance) is "localhost".
+* **Default:**   Default value (only for NubesServer instance) is `localhost`.
 
 ### `port`
 
