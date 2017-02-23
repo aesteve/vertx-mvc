@@ -15,6 +15,7 @@ import static io.vertx.core.http.HttpHeaders.CONTENT_TYPE;
 public class ContentTypeProcessor extends NoopAfterAllProcessor implements AnnotationProcessor<ContentType> {
 
   public static final String BEST_CONTENT_TYPE = "nubes-best-content-type";
+  public static final String DEFAULT_CONTENT_TYPE = "application/json";
 
   private final ContentType annotation;
 
@@ -25,10 +26,11 @@ public class ContentTypeProcessor extends NoopAfterAllProcessor implements Annot
   @Override
   public void preHandle(RoutingContext context) {
     String accept = context.request().getHeader(ACCEPT.toString());
-    if (accept == null) {
-      context.fail(406);
-      return;
+
+    if (accept == null || (!DEFAULT_CONTENT_TYPE.equals(accept))) {
+      accept = DEFAULT_CONTENT_TYPE;
     }
+
     List<String> acceptableTypes = Utils.getSortedAcceptableMimeTypes(accept);
     Optional<String> bestType = acceptableTypes.stream().filter(Arrays.asList(annotation.value())::contains).findFirst();
     if (bestType.isPresent()) {

@@ -192,7 +192,7 @@ public class MVCRoute {
   private void setHandler(Router router, Method method, boolean hasNext) {
     Handler<RoutingContext> handler = new DefaultMethodInvocationHandler<>(instance, method, config, hasNext, returnHandler);
     if (method.isAnnotationPresent(Blocking.class)) {
-      router.route(httpMethod, path).blockingHandler(handler);
+      router.route(httpMethod, path).blockingHandler(handler, method.getAnnotation(Blocking.class).ordered());
     } else {
       router.route(httpMethod, path).handler(handler);
     }
